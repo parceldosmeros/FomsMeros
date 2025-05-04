@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Check-In Embarcação</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-cover bg-center min-h-screen flex items-center justify-center" style="background-image: url('Foto Parcel dos Meros.jpg');">
+
+  <div class="bg-[#002244cc] p-8 rounded-2xl max-w-xl w-full shadow-2xl backdrop-blur">
+    <!-- Idioma -->
+    <div class="flex justify-end mb-4 gap-2">
+      <img src="https://flagcdn.com/w40/br.png" alt="Português" class="w-6 h-6 cursor-pointer" onclick="setLang('pt')" />
+      <img src="https://flagcdn.com/w40/us.png" alt="English" class="w-6 h-6 cursor-pointer" onclick="setLang('en')" />
+    </div>
+
+    <h1 id="titulo" class="text-2xl font-bold text-white text-center mb-6">Check-In da Embarcação</h1>
+
+    <form id="checkin-form" class="space-y-4">
+      <div>
+        <label id="label-primeiraVez" class="text-white font-semibold">Primeira vez no Parcel dos Meros?</label>
+        <select name="primeiraVez" required class="w-full mt-1 p-2 rounded-md">
+          <option value="">Selecione</option>
+          <option value="Sim">Sim / Yes</option>
+          <option value="Nao">Não / No</option>
+        </select>
+      </div>
+
+      <div><label id="label-nome" class="text-white font-semibold">Nome completo *</label><input type="text" name="nome" required class="w-full mt-1 p-2 rounded-md" /></div>
+      <div><label id="label-documento" class="text-white font-semibold">RG / Passaporte *</label><input type="text" name="documento" required class="w-full mt-1 p-2 rounded-md" /></div>
+      <div><label id="label-dataNascimento" class="text-white font-semibold">Data de nascimento *</label><input type="date" name="dataNascimento" required class="w-full mt-1 p-2 rounded-md" /></div>
+      <div><label id="label-cidadeNascimento" class="text-white font-semibold">Cidade e estado de nascimento *</label><input type="text" name="cidadeNascimento" required class="w-full mt-1 p-2 rounded-md" /></div>
+      <div><label id="label-cir" class="text-white font-semibold">CIR (opcional)</label><input type="text" name="cir" class="w-full mt-1 p-2 rounded-md" /></div>
+      <div><label id="label-camarote" class="text-white font-semibold">Nº do camarote *</label><input type="text" name="camarote" required class="w-full mt-1 p-2 rounded-md" /></div>
+      <div><label id="label-empresa" class="text-white font-semibold">Empresa *</label><input type="text" name="empresa" required class="w-full mt-1 p-2 rounded-md" /></div>
+      <div><label id="label-funcao" class="text-white font-semibold">Função a bordo *</label><input type="text" name="funcao" required class="w-full mt-1 p-2 rounded-md" /></div>
+      <div><label id="label-email" class="text-white font-semibold">E-mail para contato *</label><input type="email" name="email" required class="w-full mt-1 p-2 rounded-md" /></div>
+      <div><label id="label-horario" class="text-white font-semibold">Horário de serviço *</label><input type="text" name="horario" required class="w-full mt-1 p-2 rounded-md" /></div>
+
+      <!-- Botão com loading -->
+      <button id="botao-enviar" type="submit" class="w-full flex justify-center items-center gap-2 py-3 bg-gradient-to-r from-cyan-400 to-blue-600 text-white font-bold rounded-lg transition hover:opacity-90">
+        <span id="btn-text">ENVIAR CHECK-IN</span>
+        <svg id="btn-spinner" class="hidden w-5 h-5 animate-spin text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+          <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+          <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.372 0 0 5.372 0 12h4z"></path>
+        </svg>
+      </button>
+
+      <div id="form-message" class="text-center text-white font-bold mt-2"></div>
+    </form>
+  </div>
+
+  <script>
+    const lang = {
+      pt: {
+        titulo: "📋 Check-In da Embarcação",
+        primeiraVez: "Primeira vez no Parcel dos Meros?",
+        nome: "Nome completo *",
+        documento: "RG / Passaporte *",
+        dataNascimento: "Data de nascimento *",
+        cidadeNascimento: "Cidade e estado de nascimento *",
+        cir: "CIR (opcional)",
+        camarote: "Nº do camarote *",
+        empresa: "Empresa *",
+        funcao: "Função a bordo *",
+        email: "E-mail para contato *",
+        horario: "Horário de serviço *",
+        botao: "ENVIAR CHECK-IN",
+        sucesso: "✅ Check-in enviado com sucesso!",
+        erro: "❌ Erro ao enviar o formulário.",
+        enviando: "Enviando..."
+      },
+      en: {
+        titulo: "📋 Vessel Check-In",
+        primeiraVez: "First time at Parcel dos Meros?",
+        nome: "Full Name *",
+        documento: "Passport or ID *",
+        dataNascimento: "Date of Birth *",
+        cidadeNascimento: "City and State of Birth *",
+        cir: "CIR (optional)",
+        camarote: "Cabin Number *",
+        empresa: "Company *",
+        funcao: "Onboard Position *",
+        email: "Contact Email *",
+        horario: "Shift Schedule *",
+        botao: "SUBMIT CHECK-IN",
+        sucesso: "✅ Check-in sent successfully!",
+        erro: "❌ Error sending the form.",
+        enviando: "Sending..."
+      }
+    };
+
+    let currentLang = "pt";
+    function setLang(l) {
+      const t = lang[l];
+      currentLang = l;
+      document.getElementById("titulo").textContent = t.titulo;
+      document.getElementById("label-primeiraVez").textContent = t.primeiraVez;
+      document.getElementById("label-nome").textContent = t.nome;
+      document.getElementById("label-documento").textContent = t.documento;
+      document.getElementById("label-dataNascimento").textContent = t.dataNascimento;
+      document.getElementById("label-cidadeNascimento").textContent = t.cidadeNascimento;
+      document.getElementById("label-cir").textContent = t.cir;
+      document.getElementById("label-camarote").textContent = t.camarote;
+      document.getElementById("label-empresa").textContent = t.empresa;
+      document.getElementById("label-funcao").textContent = t.funcao;
+      document.getElementById("label-email").textContent = t.email;
+      document.getElementById("label-horario").textContent = t.horario;
+      document.getElementById("btn-text").textContent = t.botao;
+    }
+
+    setLang(currentLang);
+
+    document.getElementById('checkin-form').addEventListener('submit', async function (e) {
+      e.preventDefault();
+      const form = e.target;
+      const msg = document.getElementById('form-message');
+      const btn = document.getElementById('botao-enviar');
+      const btnText = document.getElementById('btn-text');
+      const spinner = document.getElementById('btn-spinner');
+
+      btn.disabled = true;
+      btn.className = "w-full flex justify-center items-center gap-2 py-3 bg-yellow-600 text-white font-bold rounded-lg";
+      btnText.textContent = lang[currentLang].enviando;
+      spinner.classList.remove("hidden");
+      msg.textContent = '';
+
+      const data = Object.fromEntries(new FormData(form).entries());
+      const webhookURL = 'https://script.google.com/macros/s/AKfycbxyHKJ1IbhhmM43ELQ6uWe7w7N8-nmsP4BiqY_I8fI/dev';
+
+      try {
+        const response = await fetch(webhookURL, {
+          method: 'POST',
+          body: JSON.stringify(data),
+          headers: { 'Content-Type': 'application/json' },
+        });
+
+        const result = await response.json();
+
+        if (result.status === 'sucesso') {
+          btn.className = "w-full flex justify-center items-center gap-2 py-3 bg-green-600 text-white font-bold rounded-lg";
+          msg.textContent = lang[currentLang].sucesso;
+          form.reset();
+        } else {
+          btn.className = "w-full flex justify-center items-center gap-2 py-3 bg-red-600 text-white font-bold rounded-lg";
+          msg.textContent = lang[currentLang].erro;
+        }
+      } catch (err) {
+        console.error(err);
+        btn.className = "w-full flex justify-center items-center gap-2 py-3 bg-red-600 text-white font-bold rounded-lg";
+        msg.textContent = lang[currentLang].erro;
+      }
+
+      btnText.textContent = lang[currentLang].botao;
+      spinner.classList.add("hidden");
+      btn.disabled = false;
+    });
+  </script>
+</body>
+</html>
